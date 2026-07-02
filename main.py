@@ -7,16 +7,25 @@ print("🕷️ Spidey AI Assistant")
 print("Type 'exit' to quit.")
 print("=" * 50)
 
+# Random startup greeting
+print(f"\n🕷️ Spidey: {assistant.personality.greeting()}")
+
 while True:
+
     user = input("\nYou: ")
 
     if user.lower() == "exit":
-        print("\nSpidey: Goodbye!")
+        print(
+            f"\n🕷️ Spidey: {assistant.personality.success_message()} See you later, boss! 👋"
+        )
         break
 
     try:
+
         response = assistant.chat(user)
+
         print(f"\n🕷️ Spidey: {response}")
 
-    except Exception as e:
-        print(f"\nError: {e}")
+    except Exception:
+
+        print(f"\n🕷️ Spidey: {assistant.personality.error_message()}")
