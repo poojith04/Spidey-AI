@@ -4,6 +4,7 @@ from app.knowledge.embedder import Embedder
 from app.knowledge.vector_store import VectorStore
 from app.knowledge.retriever import Retriever
 import os
+from app.knowledge.knowledge_tracker import KnowledgeTracker
 
 class KnowledgeEngine:
 
@@ -13,6 +14,7 @@ class KnowledgeEngine:
         self.chunker = Chunker()
         self.embedder = Embedder()
         self.store = VectorStore()
+        self.tracker = KnowledgeTracker()
 
         self.retriever = Retriever(
             self.embedder,
@@ -26,7 +28,14 @@ class KnowledgeEngine:
         index_file = "storage/knowledge.index"
         metadata_file = "storage/knowledge.pkl"
 
-        if os.path.exists(index_file) and os.path.exists(metadata_file):
+        cache_exists = (
+    os.path.exists(index_file)
+    and os.path.exists(metadata_file)
+        )
+
+        knowledge_changed = self.tracker.has_changed(folder)
+
+        if cache_exists and not knowledge_changed:
 
             self.store.load(
                 index_file,
@@ -35,7 +44,7 @@ class KnowledgeEngine:
 
             self.ready = True
 
-            print("📚 Cached Knowledge Loaded!")
+            print("⚡ Loaded cached knowledge index.")
 
             return
 
@@ -73,7 +82,16 @@ class KnowledgeEngine:
             index_file,
             metadata_file
         )
+        self.tracker.save_hash(
+            self.tracker.generate_hash(folder)
+        )
 
         self.ready = True
 
         print("✅ Knowledge Engine Ready!")
+    def ask(self, question):
+
+        if not self.ready:
+            return []
+
+        return self.retriever.retrieve(question)

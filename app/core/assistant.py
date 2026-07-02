@@ -23,57 +23,101 @@ class Assistant:
 
     def chat(self, message):
 
-        route = self.planner.route(message)
+        if message.lower() == "show plan":
 
-        # --------------------
-        # MEMORY
-        # --------------------
-
-        if route == "memory":
-
-            response = self.memory.answer_from_memory(message)
-
-            if response:
-                return self.formatter.format(response)
-
-        # --------------------
-        # TOOLS
-        # --------------------
-
-        elif route == "tool":
-
-            response = self.tools.execute(message)
-
-            if response:
-                return self.formatter.format(response)
-        # --------------------
-        # KNOWLEDGE
-        # --------------------
-
-        elif route == "knowledge":
-
-            context = self.knowledge.ask(message)
-
-            self.memory.add_message("user", message)
-
-            reply = self.brain.think(
-                self.memory.get_history(),
-                context=context
+            return "\n".join(
+                str(task)
+                for task in tasks
             )
 
-            self.memory.add_message("model", reply)
+        tasks = self.planner.plan(message)
 
-            return self.formatter.format(reply)
-        # --------------------
-        # BRAIN
-        # --------------------
+        responses = []
 
-        self.memory.add_message("user", message)
+        for task in tasks:
+            print(task.type, "->", task.message)
 
-        reply = self.brain.think(
-            self.memory.get_history()
-        )
+            # --------------------
+            # MEMORY
+            # --------------------
 
-        self.memory.add_message("model", reply)
+            if task.type == "memory":
 
-        return self.formatter.format(reply)
+                response = self.memory.answer_from_memory(
+                    task.message
+                )
+
+                if response:
+                    responses.append(
+                        self.formatter.format(response)
+                    )
+
+            # --------------------
+            # TOOLS
+            # --------------------
+
+            elif task.type == "tool":
+
+                response = self.tools.execute(
+                    task.message
+                )
+
+                if response:
+                    responses.append(
+                        self.formatter.format(response)
+                    )
+
+            # --------------------
+            # KNOWLEDGE
+            # --------------------
+
+            elif task.type == "knowledge":
+
+                context = self.knowledge.ask(
+                    task.message
+                )
+
+                self.memory.add_message(
+                    "user",
+                    task.message
+                )
+
+                reply = self.brain.think(
+                    self.memory.get_history(),
+                    context=context
+                )
+
+                self.memory.add_message(
+                    "model",
+                    reply
+                )
+
+                responses.append(
+                    self.formatter.format(reply)
+                )
+
+            # --------------------
+            # BRAIN
+            # --------------------
+
+            else:
+
+                self.memory.add_message(
+                    "user",
+                    task.message
+                )
+
+                reply = self.brain.think(
+                    self.memory.get_history()
+                )
+
+                self.memory.add_message(
+                    "model",
+                    reply
+                )
+
+                responses.append(
+                    self.formatter.format(reply)
+                )
+
+        return "\n\n".join(responses)

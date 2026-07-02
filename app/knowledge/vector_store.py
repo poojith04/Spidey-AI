@@ -70,5 +70,3 @@ class VectorStore:
 
         with open(metadata_path, "rb") as file:
             self.records = pickle.load(file)
-
-        print("⚡ Loaded cached knowledge index.")

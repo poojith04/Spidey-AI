@@ -1,43 +1,27 @@
+from app.core.intent_classifier import IntentClassifier
+from app.core.task import Task
+from app.core.task_parser import TaskParser
+
+
 class Planner:
 
-    def route(self, message):
+    def __init__(self):
 
-        message = message.lower()
+        self.classifier = IntentClassifier()
+        self.parser = TaskParser()
 
-        # Memory questions
-        if any(word in message for word in [
-            "my name",
-            "favorite",
-            "goal",
-            "college",
-            "editor"
-        ]):
-            return "memory"
-        
-        if any(word in message for word in [
+    def plan(self, message):
 
-            "my notes",
-            "my pdf",
-            "my documents",
-            "according to",
-            "from my notes",
-            "from my pdf"
+        parts = self.parser.parse(message)
 
-        ]):
-            return "knowledge"
+        tasks = []
 
-        # Tool commands
-        if any(message.startswith(cmd) for cmd in [
-            "open",
-            "create",
-            "delete",
-            "launch",
-            "close",
-            "shutdown",
-            "restart"
-        ]):
-            return "tool"
+        for part in parts:
 
-        # Everything else
-        return "brain"
-        
+            route = self.classifier.classify(part)
+
+            tasks.append(
+                Task(route, part)
+            )
+
+        return tasks
