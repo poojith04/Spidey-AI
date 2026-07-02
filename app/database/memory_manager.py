@@ -1,5 +1,5 @@
-from app.conversation_memory import Memory
-from memory.sqlite_memory import SQLiteMemory
+from app.database.conversation_memory import Memory
+from storage.sqlite_memory import SQLiteMemory
 
 
 class MemoryManager:

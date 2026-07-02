@@ -1,4 +1,4 @@
-from app.assistant import Assistant
+from app.core.assistant import Assistant
 
 assistant = Assistant()
 
