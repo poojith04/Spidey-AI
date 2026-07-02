@@ -67,3 +67,6 @@ class SQLiteMemory:
             return result[0]
 
         return None
+    def show_all(self):
+        self.cursor.execute("SELECT key, value FROM memories")
+        return self.cursor.fetchall()

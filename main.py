@@ -26,6 +26,7 @@ while True:
 
         print(f"\n🕷️ Spidey: {response}")
 
-    except Exception:
+    except Exception as e:
 
         print(f"\n🕷️ Spidey: {assistant.personality.error_message()}")
+        print(f"\nDEBUG: {e}")
