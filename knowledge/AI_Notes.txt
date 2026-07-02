@@ -1,0 +1,11 @@
+Machine Learning is a subset of Artificial Intelligence.
+
+Supervised Learning uses labeled data.
+
+Unsupervised Learning uses unlabeled data.
+
+Deep Learning is a branch of Machine Learning that uses neural networks.
+
+Convolutional Neural Networks (CNNs) are commonly used for image classification.
+
+Transfer Learning allows us to reuse pre-trained models.

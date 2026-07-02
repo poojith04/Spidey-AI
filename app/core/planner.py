@@ -13,6 +13,18 @@ class Planner:
             "editor"
         ]):
             return "memory"
+        
+        if any(word in message for word in [
+
+            "my notes",
+            "my pdf",
+            "my documents",
+            "according to",
+            "from my notes",
+            "from my pdf"
+
+        ]):
+            return "knowledge"
 
         # Tool commands
         if any(message.startswith(cmd) for cmd in [
@@ -28,3 +40,4 @@ class Planner:
 
         # Everything else
         return "brain"
+        

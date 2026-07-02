@@ -1,11 +1,11 @@
 from app.core.brain import Brain
-from app.memory.memory_manager import MemoryManager
+from app.database.memory_manager import MemoryManager
 from app.personality.personality import Personality
 from app.formatting.formatter import ResponseFormatter
-from database.ai_memory import AIMemory
+from app.database.ai_memory import AIMemory
 from app.tools.tool_manager import ToolManager
-from app.config import USE_AI_MEMORY
 from app.core.planner import Planner
+from app.knowledge.knowledge_engine import KnowledgeEngine
 
 class Assistant:
 
@@ -18,6 +18,8 @@ class Assistant:
         self.extractor = AIMemory()
         self.tools = ToolManager()
         self.planner = Planner()
+        self.knowledge = KnowledgeEngine()
+        self.knowledge.index("knowledge")
 
     def chat(self, message):
 
@@ -44,7 +46,24 @@ class Assistant:
 
             if response:
                 return self.formatter.format(response)
+        # --------------------
+        # KNOWLEDGE
+        # --------------------
 
+        elif route == "knowledge":
+
+            context = self.knowledge.ask(message)
+
+            self.memory.add_message("user", message)
+
+            reply = self.brain.think(
+                self.memory.get_history(),
+                context=context
+            )
+
+            self.memory.add_message("model", reply)
+
+            return self.formatter.format(reply)
         # --------------------
         # BRAIN
         # --------------------
