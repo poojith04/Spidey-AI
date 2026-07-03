@@ -34,3 +34,15 @@
 ### Fixed
 - Cleaner module imports
 - Improved separation of responsibilities
+# v0.8.2
+
+## Added
+
+- Planner 3.1
+- Multi-task execution
+- Task Parser
+- Developer "show plan" mode
+- Logging system
+- Better response formatting
+- Exception handling
+- Improved architecture

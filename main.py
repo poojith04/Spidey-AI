@@ -1,13 +1,11 @@
 from app.core.assistant import Assistant
+from app.core.startup import Startup
+from app.utils.logger import logger
 
 assistant = Assistant()
 
-print("=" * 50)
-print("🕷️ Spidey AI Assistant")
-print("Type 'exit' to quit.")
-print("=" * 50)
+Startup.show()
 
-# Random startup greeting
 print(f"\n🕷️ Spidey: {assistant.personality.greeting()}")
 
 while True:
@@ -28,5 +26,6 @@ while True:
 
     except Exception as e:
 
+        logger.exception(e)
+
         print(f"\n🕷️ Spidey: {assistant.personality.error_message()}")
-        print(f"\nDEBUG: {e}")
