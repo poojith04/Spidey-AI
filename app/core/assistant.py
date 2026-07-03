@@ -6,6 +6,7 @@ from app.database.ai_memory import AIMemory
 from app.tools.tool_manager import ToolManager
 from app.core.planner import Planner
 from app.knowledge.knowledge_engine import KnowledgeEngine
+from app.utils.logger import logger
 
 class Assistant:
 
@@ -30,94 +31,102 @@ class Assistant:
                 for task in tasks
             )
 
-        tasks = self.planner.plan(message)
+        if message.lower().startswith("show plan"):
+            command="show plan"
 
+            plan_message = message[len(command):].strip()
+
+            tasks = self.planner.plan(plan_message)
+
+            return "\n".join(str(task) for task in tasks)
+
+        tasks = self.planner.plan(message)
+        
         responses = []
 
         for task in tasks:
-            print(task.type, "->", task.message)
+            logger.info(f"{task.type} -> {task.message}")
 
             # --------------------
             # MEMORY
             # --------------------
+            try:
+                if task.type == "memory":
 
-            if task.type == "memory":
-
-                response = self.memory.answer_from_memory(
-                    task.message
-                )
-
-                if response:
-                    responses.append(
-                        self.formatter.format(response)
+                    response = self.memory.answer_from_memory(
+                        task.message
                     )
 
-            # --------------------
-            # TOOLS
-            # --------------------
+                    if response:
+                        responses.append(response)
 
-            elif task.type == "tool":
+                # --------------------
+                # TOOLS
+                # --------------------
 
-                response = self.tools.execute(
-                    task.message
-                )
+                elif task.type == "tool":
 
-                if response:
-                    responses.append(
-                        self.formatter.format(response)
+                    response = self.tools.execute(
+                        task.message
                     )
 
-            # --------------------
-            # KNOWLEDGE
-            # --------------------
+                    if response:
+                        responses.append(response)
 
-            elif task.type == "knowledge":
+                # --------------------
+                # KNOWLEDGE
+                # --------------------
 
-                context = self.knowledge.ask(
-                    task.message
-                )
+                elif task.type == "knowledge":
 
-                self.memory.add_message(
-                    "user",
-                    task.message
-                )
+                    context = self.knowledge.ask(
+                        task.message
+                    )
 
-                reply = self.brain.think(
-                    self.memory.get_history(),
-                    context=context
-                )
+                    self.memory.add_message(
+                        "user",
+                        task.message
+                    )
 
-                self.memory.add_message(
-                    "model",
-                    reply
-                )
+                    reply = self.brain.think(
+                        self.memory.get_history(),
+                        context=context
+                    )
+
+                    self.memory.add_message(
+                        "model",
+                        reply
+                    )
+
+                    responses.append(reply)
+
+                # --------------------
+                # BRAIN
+                # --------------------
+
+                else:
+
+                    self.memory.add_message(
+                        "user",
+                        task.message
+                    )
+
+                    reply = self.brain.think(
+                        self.memory.get_history()
+                    )
+
+                    self.memory.add_message(
+                        "model",
+                        reply
+                    )
+
+                    responses.append(reply)
+            except Exception as e:
+                logger.exception(e)
 
                 responses.append(
-                    self.formatter.format(reply)
+                    "Something went wrong while I was working on that task."
                 )
+        combined = "\n\n".join(responses)
 
-            # --------------------
-            # BRAIN
-            # --------------------
-
-            else:
-
-                self.memory.add_message(
-                    "user",
-                    task.message
-                )
-
-                reply = self.brain.think(
-                    self.memory.get_history()
-                )
-
-                self.memory.add_message(
-                    "model",
-                    reply
-                )
-
-                responses.append(
-                    self.formatter.format(reply)
-                )
-
-        return "\n\n".join(responses)
+        return self.formatter.format(combined)
