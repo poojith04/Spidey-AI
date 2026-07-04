@@ -46,3 +46,23 @@
 - Better response formatting
 - Exception handling
 - Improved architecture
+# Changelog
+
+## v0.8.3
+- Refactored Planner architecture
+- Added KnowledgeRouter scaffold
+- Improved startup banner
+- Cleaned logging
+- Added modular routing foundation
+
+## v0.8.2
+- Planner 3.1
+- Multi-task execution
+- Task parser
+- Developer show plan mode
+
+## v0.8.1
+- Persistent Knowledge Engine
+- Cached vector index
+
+...

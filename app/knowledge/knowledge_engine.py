@@ -11,9 +11,13 @@ class KnowledgeEngine:
     def __init__(self):
 
         self.loader = DocumentLoader()
+
         self.chunker = Chunker()
+
         self.embedder = Embedder()
+
         self.store = VectorStore()
+
         self.tracker = KnowledgeTracker()
 
         self.retriever = Retriever(
@@ -89,9 +93,17 @@ class KnowledgeEngine:
         self.ready = True
 
         print("✅ Knowledge Engine Ready!")
-    def ask(self, question):
+    
+    def search(self, question, top_k=5):
 
         if not self.ready:
             return []
 
-        return self.retriever.retrieve(question)
+        return self.retriever.retrieve(
+            question,
+            top_k=top_k
+        )
+
+    def ask(self, question):
+
+        return self.search(question)

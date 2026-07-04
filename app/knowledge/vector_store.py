@@ -35,19 +35,23 @@ class VectorStore:
             dtype="float32"
         )
 
-        _, indices = self.index.search(
+        distances, indices = self.index.search(
             query_embedding,
             top_k
         )
 
         results = []
 
-        for idx in indices[0]:
+        for distance, idx in zip(distances[0], indices[0]):
 
-            if idx != -1:
-                results.append(
-                    self.records[idx]
-                )
+            if idx == -1:
+                continue
+
+            record = self.records[idx].copy()
+
+            record["distance"] = float(distance)
+
+            results.append(record)
 
         return results
     def save(self,

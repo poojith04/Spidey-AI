@@ -14,18 +14,18 @@ class Assistant:
     def __init__(self):
 
         self.brain = Brain()
+
         self.memory = MemoryManager()
+
         self.personality = Personality()
         self.formatter = ResponseFormatter()
-        self.extractor = AIMemory()
-        self.tools = ToolManager()
 
-        # Create Knowledge Engine first
+        self.extractor = AIMemory()
+
+        self.tools = ToolManager()
         self.knowledge = KnowledgeEngine()
         self.knowledge.index("knowledge")
-
         self.router = KnowledgeRouter(self.knowledge)
-
         self.planner = Planner()
 
     def chat(self, message):
@@ -110,16 +110,37 @@ class Assistant:
                 # BRAIN
                 # --------------------
 
+                                # --------------------
+                # BRAIN
+                # --------------------
+
                 else:
+
+                    decision = self.router.route(task.message)
+
+                    print(
+                        f"KnowledgeRouter: "
+                        f"use={decision.use_knowledge}, "
+                        f"distance={decision.distance}"
+                    )
 
                     self.memory.add_message(
                         "user",
                         task.message
                     )
 
-                    reply = self.brain.think(
-                        self.memory.get_history()
-                    )
+                    if decision.use_knowledge:
+
+                        reply = self.brain.think(
+                            self.memory.get_history(),
+                            context=decision.results
+                        )
+
+                    else:
+
+                        reply = self.brain.think(
+                            self.memory.get_history()
+                        )
 
                     self.memory.add_message(
                         "model",
