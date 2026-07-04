@@ -1,7 +1,7 @@
 from app.core.intent_classifier import IntentClassifier
 from app.core.task import Task
 from app.core.task_parser import TaskParser
-
+from app.core.knowledge_router import KnowledgeRouter
 
 class Planner:
 

@@ -55,3 +55,14 @@ class IntentClassifier:
             return "tool"
 
         return "brain"
+    def classify_with_router(self, message, router):
+
+        route = self.classify(message)
+
+        if route != "brain":
+            return route
+
+        if router.should_use_knowledge(message):
+            return "knowledge"
+
+        return "brain"

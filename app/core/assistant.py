@@ -1,4 +1,5 @@
 from app.core.brain import Brain
+from app.core.knowledge_router import KnowledgeRouter
 from app.database.memory_manager import MemoryManager
 from app.personality.personality import Personality
 from app.formatting.formatter import ResponseFormatter
@@ -18,9 +19,14 @@ class Assistant:
         self.formatter = ResponseFormatter()
         self.extractor = AIMemory()
         self.tools = ToolManager()
-        self.planner = Planner()
+
+        # Create Knowledge Engine first
         self.knowledge = KnowledgeEngine()
         self.knowledge.index("knowledge")
+
+        self.router = KnowledgeRouter(self.knowledge)
+
+        self.planner = Planner()
 
     def chat(self, message):
 
